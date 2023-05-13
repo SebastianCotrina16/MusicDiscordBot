@@ -49,7 +49,7 @@ async def play(ctx, *, url):
 
     if voice_client.is_playing():
         voice_client.stop()
-  with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
 
         if "formats" not in info:
