@@ -5,10 +5,18 @@ import discord
 
 load_dotenv()
 
-TOKEN = os.getenv('TOKEN')
-COMMAND_PREFIX = "."
+COMMAND_PREFIX = '.'
 intents = discord.Intents.all()
-intents.members = True
+
+TOKEN = os.getenv('TOKEN')
 
 bot = MusicBot(command_prefix=COMMAND_PREFIX, intents=intents)
+
+@bot.event
+async def on_ready():
+    print('Bot online')
+    print('Comandos registrados:')
+    for command in bot.commands:
+        print(command.name)
+
 bot.run(TOKEN)

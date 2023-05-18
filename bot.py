@@ -4,6 +4,10 @@ from discord.ext import commands
 from discord.utils import get
 from discord import FFmpegPCMAudio
 import yt_dlp as youtube_dl
+import traceback
+import sys
+
+intents = discord.Intents.default()
 
 INACTIVITY_TIME = 120
 AUDIO_FORMAT_OPTIONS = {
@@ -22,7 +26,13 @@ FFMPEG_OPTIONS = {
 
 class MusicBot(commands.Bot):
     def __init__(self, command_prefix, intents):
-        super().__init__(command_prefix, intents=intents)
+        super().__init__(command_prefix=command_prefix, intents=intents)
+        self.add_command(self.join)
+        self.add_command(self.play)
+        self.add_command(self.resume)
+        self.add_command(self.pause)
+        self.add_command(self.stop)
+        self.add_command(self.clear)
 
     async def on_ready(self):
         print('Bot online')
@@ -30,14 +40,21 @@ class MusicBot(commands.Bot):
         for command in self.commands:
             print(command.name)
 
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.CommandInvokeError):
+            original = error.original
+            print(f'In {ctx.command.qualified_name}:', file=sys.stderr)
+            traceback.print_tb(original.__traceback__)
+            print(f'{original.__class__.__name__}: {original}', file=sys.stderr)
+
     async def disconnect_after_inactivity(self, voice_client):
         await asyncio.sleep(INACTIVITY_TIME)
         if not voice_client.is_playing() and not voice_client.is_paused():
             await voice_client.disconnect()
 
-    @commands.command()    
+    @commands.command()
     async def join(self, ctx):
-        channel = ctx.message.author.voice.channel
+        channel = ctx.author.voice.channel
         voice = get(self.voice_clients, guild=ctx.guild)
         if voice and voice.is_connected():
             await voice.move_to(channel)
@@ -78,9 +95,10 @@ class MusicBot(commands.Bot):
         voice = get(self.voice_clients, guild=ctx.guild)
         if voice.is_playing():
             voice.stop()
-            await ctx.send('Stoping')
+            await ctx.send('Stopping')
 
     @commands.command()
     async def clear(self, ctx, amount=5):
         await ctx.channel.purge(limit=amount)
         await ctx.send("Clearing")
+
