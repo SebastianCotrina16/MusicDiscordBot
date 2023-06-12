@@ -37,3 +37,9 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+    - name: Run bot
+      run: python bot.py
+      env:
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        SPOTIFY_ID: ${{ secrets.SPOTIFY_ID }}
+        SPOTIFY_SECRET: ${{ secrets.SPOTIFY_SECRET }}
