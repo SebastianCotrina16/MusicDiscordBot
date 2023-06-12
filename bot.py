@@ -13,4 +13,4 @@ from players.tidal_player import TidalPlayer
 intents = discord.Intents.all()
 intents.members = True
 bot = MusicBot(command_prefix=".", self_bot=False,intents=discord.Intents.all())
-bot.run(TOKEN)
+bot.run(os.getenv("DISCORD_TOKEN"))
